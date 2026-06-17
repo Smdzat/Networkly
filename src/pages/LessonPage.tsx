@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, X, Info, ChevronDown, ChevronUp, Lightbulb, Circ
 import { getLessonById, lessons } from '../data/lessons'
 import type { LessonStep } from '../types'
 import NetworkCanvas from '../components/NetworkCanvas'
+import { useAuth } from '../lib/useAuth'
+import { saveLessonProgress, fetchLessonProgress } from '../lib/progress'
 
 interface FlatStep {
   subtopicTitle: string
@@ -18,6 +20,9 @@ export default function LessonPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const lesson = getLessonById(lessonId || '')
+  const { user } = useAuth()
+  const furthestRef = useRef(0)
+  const progressReadyRef = useRef(false)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -45,9 +50,12 @@ export default function LessonPage() {
     // specific step. Map that pair onto the flat step index. Without a
     // state we start at the beginning.
     const navState = location.state as
-      | { subtopicIndex?: number; stepIndex?: number }
+      | { subtopicIndex?: number; stepIndex?: number; flatIndex?: number }
       | null
-    if (lesson && navState && typeof navState.subtopicIndex === 'number') {
+    if (lesson && navState && typeof navState.flatIndex === 'number') {
+      // Resume directly at a saved flat step index ("continue where you left off")
+      setCurrentIndex(Math.max(0, navState.flatIndex))
+    } else if (lesson && navState && typeof navState.subtopicIndex === 'number') {
       const si = Math.max(0, Math.min(navState.subtopicIndex, lesson.subtopics.length - 1))
       let flatIdx = 0
       for (let i = 0; i < si; i++) flatIdx += lesson.subtopics[i].steps.length
@@ -68,6 +76,45 @@ export default function LessonPage() {
     const timer = setTimeout(() => setFocusMode(false), 3500)
     return () => clearTimeout(timer)
   }, [currentIndex])
+
+  /* --------------------------------------------------------------
+     Progress persistence (only for signed-in users)
+     - Seed the "furthest reached" from Firestore on lesson change so
+       the progress bar never regresses.
+     - Save current + furthest step on each navigation.
+  ----------------------------------------------------------------- */
+  useEffect(() => {
+    progressReadyRef.current = false
+    furthestRef.current = 0
+    if (!user || !lesson) {
+      progressReadyRef.current = true
+      return
+    }
+    let active = true
+    fetchLessonProgress(user.uid, lesson.id)
+      .then((p) => {
+        if (active && p) furthestRef.current = p.furthest ?? 0
+      })
+      .catch(() => {})
+      .finally(() => {
+        // Only allow saving once the stored "furthest" is loaded, so a
+        // fresh mount at step 0 can't overwrite a higher saved value.
+        if (active) progressReadyRef.current = true
+      })
+    return () => {
+      active = false
+    }
+  }, [user, lessonId])
+
+  useEffect(() => {
+    if (!user || !lesson) return
+    if (!progressReadyRef.current) return
+    const totalSteps = lesson.subtopics.reduce((a, st) => a + st.steps.length, 0)
+    if (totalSteps === 0) return
+    const idx = Math.min(currentIndex, totalSteps - 1)
+    furthestRef.current = Math.max(furthestRef.current, idx)
+    saveLessonProgress(user.uid, lesson.id, idx, furthestRef.current, totalSteps).catch(() => {})
+  }, [user, lessonId, currentIndex])
 
   if (!lesson) {
     return (

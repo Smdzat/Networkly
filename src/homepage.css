@@ -495,38 +495,6 @@ html, body {
 
 .nav__download svg {
     flex-shrink: 0;
-    transition: opacity 0.2s ease;
-}
-
-.nav__download-label {
-    transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.nav__download-soon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: #5fdc9a;
-    opacity: 0;
-    transform: translateY(3px);
-    transition: opacity 0.18s ease, transform 0.18s ease;
-    pointer-events: none;
-}
-
-.nav__download.is-notified .nav__download-label,
-.nav__download.is-notified svg {
-    opacity: 0;
-    transform: translateY(-3px);
-}
-
-.nav__download.is-notified .nav__download-soon {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .nav__signin svg {
@@ -1386,39 +1354,6 @@ button.portfolio__cta {
 
 .footer__download-btn svg {
     flex-shrink: 0;
-    transition: opacity 0.2s ease;
-}
-
-.footer__download-label {
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.footer__download-soon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    color: #5fdc9a;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
-    pointer-events: none;
-}
-
-/* "Coming soon" state — label fades out, soon fades in */
-.footer__download-btn.is-notified .footer__download-label,
-.footer__download-btn.is-notified svg {
-    opacity: 0;
-    transform: translateY(-4px);
-}
-
-.footer__download-btn.is-notified .footer__download-soon {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 @media (max-width: 860px) {
@@ -2837,77 +2772,6 @@ canvas {
     margin: 0 0 24px;
 }
 
-/* Labelled fields — label sits above the input, lowercase mono */
-.signup__form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin-bottom: 16px;
-}
-
-.signup__field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.signup__field > span {
-    font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.55);
-    letter-spacing: 0.02em;
-}
-
-.signup__field > input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 6px;
-    padding: 12px 14px;
-    color: #ffffff;
-    font: inherit;
-    font-size: 14.5px;
-    font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
-    letter-spacing: 0.02em;
-    outline: none;
-    transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.signup__field > input::placeholder {
-    color: rgba(255, 255, 255, 0.25);
-}
-
-.signup__field > input:focus {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.signup__submit {
-    align-self: flex-start;
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    cursor: pointer;
-    padding: 11px 22px;
-    border-radius: 6px;
-    background: #ffffff;
-    color: #0a0a0a;
-    font: inherit;
-    font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-    transition: transform 0.18s ease, box-shadow 0.2s ease;
-}
-
-.signup__submit:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.18);
-}
-
 /* Google sign-in — primary, recognizable white button with brand mark */
 .signup__google {
     width: 100%;
@@ -2943,30 +2807,6 @@ canvas {
     flex-shrink: 0;
 }
 
-/* "oder" divider between Google and the email form */
-.signup__or {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 16px 0;
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.signup__or::before,
-.signup__or::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.signup__or span {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-}
-
 /* Auth error line */
 .signup__error {
     font-family: 'JetBrains Mono', monospace;
@@ -2983,11 +2823,9 @@ canvas {
     margin: 0;
 }
 
-.signup.is-success .signup__form,
 .signup.is-success .signup__hint,
 .signup.is-success .signup__subtitle,
 .signup.is-success .signup__google,
-.signup.is-success .signup__or,
 .signup.is-success .signup__error {
     display: none;
 }
@@ -3694,18 +3532,6 @@ body.is-homepage ::selection {
     color: rgba(248, 113, 113, 0.85);
 }
 
-/* ---- Sign-up popup (full border, dark card) ---- */
-.signup__field.is-invalid > input {
-    border-color: rgba(248, 113, 113, 0.7);
-    background: rgba(248, 113, 113, 0.06);
-    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.08);
-    animation: form-error-shake 0.35s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-.signup__field.is-invalid > span {
-    color: rgba(248, 113, 113, 0.85);
-}
-
 /* ---- Lessons popup (input is direct child of <form>, no label wrap) ---- */
 .popup__form.is-invalid input {
     border-color: rgba(248, 113, 113, 0.7);
@@ -3747,11 +3573,6 @@ body.is-homepage ::selection {
     padding-left: 4px;
 }
 
-/* Slightly tighter spacing inside the signup card */
-.signup__field .form-error {
-    margin-top: 6px;
-}
-
 @keyframes form-error-fade {
     from { opacity: 0; transform: translateY(-2px); }
     to   { opacity: 1; transform: translateY(0);    }
@@ -3766,7 +3587,6 @@ body.is-homepage ::selection {
 @media (prefers-reduced-motion: reduce) {
     .contact-form__field.is-invalid input,
     .contact-form__field.is-invalid textarea,
-    .signup__field.is-invalid > input,
     .popup__form.is-invalid input {
         animation: none;
     }
@@ -3964,105 +3784,6 @@ body.is-homepage ::selection {
 
 .hero__cta--outline svg {
     flex-shrink: 0;
-    transition: opacity 0.2s ease;
-}
-
-.hero__download-label {
-    transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.hero__download-soon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: #5fdc9a;
-    opacity: 0;
-    transform: translateY(3px);
-    transition: opacity 0.18s ease, transform 0.18s ease;
-    pointer-events: none;
-}
-
-.hero__cta--outline.is-notified .hero__download-label,
-.hero__cta--outline.is-notified svg {
-    opacity: 0;
-    transform: translateY(-3px);
-}
-
-.hero__cta--outline.is-notified .hero__download-soon {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-
-/* ================================
-   Feature strip — 3 selling points below hero
-================================ */
-.features {
-    background-color: #060606;
-    padding: 100px 24px 80px;
-    position: relative;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.features__grid {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 48px;
-}
-
-.features__item {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-}
-
-.features__icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 4px;
-}
-
-.features__title {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 0;
-}
-
-.features__text {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.55);
-    margin: 0;
-    max-width: 280px;
-}
-
-@media (max-width: 720px) {
-    .features {
-        padding: 60px 24px 50px;
-    }
-    .features__grid {
-        grid-template-columns: 1fr;
-        gap: 36px;
-    }
 }
 
 
@@ -4251,5 +3972,514 @@ body.is-homepage ::selection {
     .notify.is-closing .notify__backdrop,
     .notify.is-closing .notify__panel {
         animation: none;
+    }
+}
+
+
+/* ================================
+   Nav profile menu (signed-in users)
+================================ */
+.nav__profile {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.nav__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.nav__avatar:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.nav__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.nav__avatar-fallback {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.nav__menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 240px;
+    background: rgba(14, 14, 16, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+    padding: 8px;
+    z-index: 200;
+    animation: nav-menu-in 0.18s ease both;
+}
+
+@keyframes nav-menu-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.nav__menu-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px 12px;
+}
+
+.nav__menu-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.nav__menu-id {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.nav__menu-name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav__menu-email {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav__menu-sep {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 4px 0;
+}
+
+.nav__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13.5px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav__menu-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+}
+
+.nav__menu-item svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.nav__menu-item--danger {
+    color: rgba(248, 113, 113, 0.9);
+}
+.nav__menu-item--danger:hover {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+}
+
+@media (max-width: 720px) {
+    .nav__menu {
+        width: 220px;
+    }
+}
+
+
+/* ================================
+   Lesson progress bar (in the popup lesson rows)
+================================ */
+.lesson__progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    max-width: 320px;
+}
+
+.lesson__progress-track {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.lesson__progress-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: #4a7fb8;
+    transition: width 0.4s cubic-bezier(.2, .8, .2, 1);
+}
+
+.lesson__progress-fill.is-complete {
+    background: #4ade80;
+}
+
+.lesson__progress-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* "Continue where you left off" banner */
+.lesson-continue {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(74, 127, 184, 0.35);
+    background: linear-gradient(135deg, rgba(74, 127, 184, 0.14), rgba(74, 127, 184, 0.04));
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.lesson-continue:hover {
+    border-color: rgba(74, 127, 184, 0.6);
+    transform: translateY(-1px);
+}
+
+.lesson-continue__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.lesson-continue__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7da3df;
+}
+
+.lesson-continue__title {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lesson-continue__arrow {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.95);
+    color: #0a0a0a;
+    transition: transform 0.2s ease;
+}
+
+.lesson-continue:hover .lesson-continue__arrow {
+    transform: translateX(3px);
+}
+
+
+/* ================================
+   Settings modal
+================================ */
+.settings {
+    position: fixed;
+    inset: 0;
+    z-index: 9600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.settings__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 6, 6, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: notify-backdrop-in 0.28s ease both;
+}
+
+.settings__panel {
+    position: relative;
+    z-index: 1;
+    width: min(92vw, 460px);
+    background: rgba(12, 12, 14, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+    padding: 32px 32px 28px;
+    animation: notify-panel-in 0.3s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.settings__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+.settings__close:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.settings__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 0 10px;
+}
+
+.settings__title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.settings__rule {
+    height: 3px;
+    width: 44px;
+    margin: 16px 0 22px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #4a7fb8, rgba(74, 127, 184, 0));
+}
+
+.settings__account {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 22px;
+}
+
+.settings__avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.settings__name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.settings__email {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 2px;
+}
+
+.settings__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.settings__row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.settings__row-title {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.settings__row-desc {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.45);
+    max-width: 280px;
+}
+
+.settings__danger-btn {
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    background: transparent;
+    color: #f87171;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.settings__danger-btn:hover {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.6);
+}
+
+.settings__logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 22px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.settings__logout:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .settings__backdrop,
+    .settings__panel,
+    .nav__menu {
+        animation: none;
+    }
+}
+
+
+/* ================================
+   Mobile refinements — new components
+   (profile menu, notify/settings modals, progress, continue banner)
+================================ */
+@media (max-width: 720px) {
+    /* Profile dropdown — keep it inside the viewport */
+    .nav__menu {
+        width: min(82vw, 240px);
+    }
+
+    /* Notify + settings modals — tighter padding on phones */
+    .notify__panel,
+    .settings__panel {
+        padding: 28px 22px 24px;
+    }
+
+    .notify__title,
+    .settings__title {
+        font-size: 23px;
+    }
+
+    /* Continue banner — a touch more compact */
+    .lesson-continue {
+        padding: 14px 16px;
+        margin-bottom: 16px;
+    }
+
+    .lesson-continue__title {
+        font-size: 14px;
+    }
+
+    /* Progress bar fills the row on narrow screens */
+    .lesson__progress {
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Settings rows stack so the button doesn't get squeezed */
+    .settings__row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .settings__danger-btn {
+        align-self: stretch;
+        text-align: center;
+    }
+
+    .settings__row-desc {
+        max-width: none;
+    }
+
+    /* Hero dual CTAs full-width-ish, stacked and centered */
+    .hero__ctas {
+        width: 100%;
     }
 }

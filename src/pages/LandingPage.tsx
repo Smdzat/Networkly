@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signInWithPopup, onAuthStateChanged, type User } from 'firebase/auth'
+import { signInWithPopup, onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, googleProvider, db } from '../lib/firebase'
+import { fetchAllProgress, resetAllProgress, type ProgressMap } from '../lib/progress'
 import '../homepage.css'
 import { lessons } from '../data/lessons'
 
@@ -257,6 +258,11 @@ export default function LandingPage() {
   const [notifyClosing, setNotifyClosing] = useState(false)
   const [notifyStatus, setNotifyStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const notifyInputRef = useRef<HTMLInputElement | null>(null)
+  // Profile menu + progress (signed-in users)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [progressMap, setProgressMap] = useState<ProgressMap>({})
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement | null>(null)
 
   // Refs for elements the JS effects need to grab.
   const navRef = useRef<HTMLElement | null>(null)
@@ -271,7 +277,6 @@ export default function LandingPage() {
   const popupRef = useRef<HTMLDivElement | null>(null)
   const popupFormRef = useRef<HTMLFormElement | null>(null)
   const signupRef = useRef<HTMLDivElement | null>(null)
-  const signupFormRef = useRef<HTMLFormElement | null>(null)
   const portfolioRef = useRef<HTMLDivElement | null>(null)
   const contactFormRef = useRef<HTMLFormElement | null>(null)
   const burgerRef = useRef<HTMLButtonElement | null>(null)
@@ -344,6 +349,62 @@ export default function LandingPage() {
     const unsub = onAuthStateChanged(auth, (u) => setAuthUser(u))
     return unsub
   }, [])
+
+  // Load the signed-in user's lesson progress (for the progress bars in
+  // the lessons popup). Re-fetched whenever the lessons popup opens so it
+  // reflects progress made since last open.
+  useEffect(() => {
+    if (!authUser) {
+      setProgressMap({})
+      return
+    }
+    let active = true
+    fetchAllProgress(authUser.uid)
+      .then((m) => {
+        if (active) setProgressMap(m)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [authUser, popupOpen])
+
+  // Close the profile dropdown on outside click / ESC
+  useEffect(() => {
+    if (!profileMenuOpen) return
+    const onDown = (e: MouseEvent) => {
+      if (!profileMenuRef.current?.contains(e.target as Node)) setProfileMenuOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setProfileMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [profileMenuOpen])
+
+  const handleLogout = async () => {
+    setProfileMenuOpen(false)
+    setSettingsOpen(false)
+    try {
+      await signOut(auth)
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const handleResetProgress = async () => {
+    if (!authUser) return
+    try {
+      await resetAllProgress(authUser.uid)
+      setProgressMap({})
+    } catch {
+      /* ignore */
+    }
+  }
 
   const handleGoogleSignIn = async () => {
     if (authBusy) return
@@ -948,11 +1009,10 @@ export default function LandingPage() {
   }, [])
 
   /* --------------------------------------------------------------
-     Sign-up popup close handlers + form submit
+     Sign-up popup close handlers (Google-only, no email form)
   ----------------------------------------------------------------- */
   useEffect(() => {
     const popup = signupRef.current
-    const form = signupFormRef.current
     if (!popup) return
 
     const closePopup = () => {
@@ -971,22 +1031,13 @@ export default function LandingPage() {
         closePopup()
       }
     }
-    const onSubmit = (e: Event) => {
-      e.preventDefault()
-      if (!form) return
-      if (!validateFormCustom(form)) return
-      popup.classList.add('is-success')
-      form.reset()
-    }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && popup.classList.contains('is-open')) closePopup()
     }
     popup.addEventListener('click', onClick)
-    form?.addEventListener('submit', onSubmit)
     document.addEventListener('keydown', onKey)
     return () => {
       popup.removeEventListener('click', onClick)
-      form?.removeEventListener('submit', onSubmit)
       document.removeEventListener('keydown', onKey)
     }
   }, [])
@@ -1206,10 +1257,50 @@ export default function LandingPage() {
               </span>
             </div>
 
+            {authUser && (() => {
+              const inProgress = lessons.find(
+                (l) => progressMap[l.id] && !progressMap[l.id].completed,
+              )
+              if (!inProgress) return null
+              const p = progressMap[inProgress.id]
+              return (
+                <button
+                  type="button"
+                  className="lesson-continue"
+                  onClick={() =>
+                    navigate(`/lesson/${inProgress.id}`, { state: { flatIndex: p.stepIndex } })
+                  }
+                >
+                  <div className="lesson-continue__text">
+                    <span className="lesson-continue__eyebrow">▸ Weitermachen wo du warst</span>
+                    <span className="lesson-continue__title">
+                      {inProgress.number} · {inProgress.title}
+                    </span>
+                  </div>
+                  <span className="lesson-continue__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </span>
+                </button>
+              )
+            })()}
+
             <div className="lesson-list">
               {lessons.map((lesson) => {
                 const stepCount = lesson.subtopics.reduce((a, st) => a + st.steps.length, 0)
                 const isOpen = expandedLesson === lesson.id
+                const prog = progressMap[lesson.id]
+                const pct = prog
+                  ? Math.min(
+                      100,
+                      Math.round(
+                        ((prog.completed ? prog.totalSteps : prog.furthest + 1) /
+                          (prog.totalSteps || stepCount)) *
+                          100,
+                      ),
+                    )
+                  : 0
                 return (
                   <div key={lesson.id} className={`lesson${isOpen ? ' is-open' : ''}`}>
                     <div
@@ -1221,6 +1312,19 @@ export default function LandingPage() {
                         <div className="lesson__text">
                           <h4 className="lesson__title">{lesson.title}</h4>
                           <p className="lesson__subtitle">{lesson.subtitle}</p>
+                          {authUser && prog && (
+                            <div className="lesson__progress">
+                              <div className="lesson__progress-track">
+                                <span
+                                  className={`lesson__progress-fill${prog.completed ? ' is-complete' : ''}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                              <span className="lesson__progress-label">
+                                {prog.completed ? '✓ Abgeschlossen' : `${pct}%`}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="lesson__right">
@@ -1342,30 +1446,6 @@ export default function LandingPage() {
             {authBusy ? 'Wird angemeldet…' : 'Mit Google anmelden'}
           </button>
 
-          <div className="signup__or" aria-hidden="true">
-            <span>oder</span>
-          </div>
-
-          <form className="signup__form" ref={signupFormRef} noValidate>
-            <label className="signup__field">
-              <span>email</span>
-              <input
-                type="email"
-                name="email"
-                placeholder="you@domain.com"
-                required
-                autoComplete="email"
-              />
-            </label>
-
-            <button type="submit" className="signup__submit">
-              Request access
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </button>
-          </form>
-
           {authError && (
             <p className="signup__error" role="alert">{authError}</p>
           )}
@@ -1420,12 +1500,81 @@ export default function LandingPage() {
               <span>Download</span>
             </button>
 
-            <a href="#" className="nav__signin" data-curtain data-popup="signup">
-              <span>Sign up</span>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </a>
+            {authUser ? (
+              <div className="nav__profile" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  className="nav__avatar"
+                  aria-label="Profilmenü"
+                  aria-expanded={profileMenuOpen}
+                  onClick={() => setProfileMenuOpen((o) => !o)}
+                >
+                  {authUser.photoURL ? (
+                    <img src={authUser.photoURL} alt="" referrerPolicy="no-referrer" />
+                  ) : (
+                    <span className="nav__avatar-fallback">
+                      {(authUser.displayName ?? authUser.email ?? '?').charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </button>
+
+                {profileMenuOpen && (
+                  <div className="nav__menu" role="menu">
+                    <div className="nav__menu-head">
+                      {authUser.photoURL && (
+                        <img src={authUser.photoURL} alt="" referrerPolicy="no-referrer" className="nav__menu-avatar" />
+                      )}
+                      <div className="nav__menu-id">
+                        <span className="nav__menu-name">{authUser.displayName ?? 'Eingeloggt'}</span>
+                        <span className="nav__menu-email">{authUser.email}</span>
+                      </div>
+                    </div>
+                    <div className="nav__menu-sep" aria-hidden="true"></div>
+                    <button
+                      type="button"
+                      className="nav__menu-item"
+                      role="menuitem"
+                      onClick={() => {
+                        setProfileMenuOpen(false)
+                        const trigger = document.getElementById('lessons-cta')
+                        ;(trigger as HTMLAnchorElement | null)?.click()
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                      Mein Fortschritt
+                    </button>
+                    <button
+                      type="button"
+                      className="nav__menu-item"
+                      role="menuitem"
+                      onClick={() => {
+                        setProfileMenuOpen(false)
+                        setSettingsOpen(true)
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                      Einstellungen
+                    </button>
+                    <button
+                      type="button"
+                      className="nav__menu-item nav__menu-item--danger"
+                      role="menuitem"
+                      onClick={handleLogout}
+                    >
+                      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                      Abmelden
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <a href="#" className="nav__signin" data-curtain data-popup="signup">
+                <span>Sign up</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+            )}
           </div>
 
           <button
@@ -1495,53 +1644,12 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <a href="#features" className="hero__scroll" aria-label="Scroll down">
+        <a href="#cta" className="hero__scroll" aria-label="Scroll down">
           <span className="hero__scroll-mouse">
             <span className="hero__scroll-wheel"></span>
           </span>
           <span className="hero__scroll-label">SCROLL</span>
         </a>
-      </section>
-
-      {/* Feature strip — 3 selling points */}
-      <section className="features" id="features">
-        <div className="features__grid">
-          <div className="features__item">
-            <div className="features__icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-              </svg>
-            </div>
-            <h3 className="features__title">Visuell statt Text</h3>
-            <p className="features__text">
-              Jedes Konzept wird als animierte Topologie dargestellt. Du siehst wie Pakete fließen, nicht nur wie sie heißen.
-            </p>
-          </div>
-          <div className="features__item">
-            <div className="features__icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg>
-            </div>
-            <h3 className="features__title">Schritt für Schritt</h3>
-            <p className="features__text">
-              Kein Vorwissen nötig. Jeder Hop wird einzeln erklärt — von Layer 1 bis zur fertigen Verbindung.
-            </p>
-          </div>
-          <div className="features__item">
-            <div className="features__icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M9 3v18M3 9h6M3 15h6" />
-              </svg>
-            </div>
-            <h3 className="features__title">15+ Lektionen</h3>
-            <p className="features__text">
-              Von Netzwerk-Grundlagen über OSI-Modell bis Wireless — das komplette CCNA Kapitel 1, kostenlos.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Topics strip */}
@@ -2017,6 +2125,57 @@ export default function LandingPage() {
                 <p className="notify__hint">Kein Spam. Eine Nachricht zum Launch, das war's.</p>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Settings modal (signed-in users) */}
+      {settingsOpen && authUser && (
+        <div className="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+          <div className="settings__backdrop" onClick={() => setSettingsOpen(false)}></div>
+          <div className="settings__panel" role="document">
+            <button className="settings__close" type="button" aria-label="Schließen" onClick={() => setSettingsOpen(false)}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+
+            <p className="settings__eyebrow">EINSTELLUNGEN</p>
+            <h2 className="settings__title" id="settingsTitle">Dein Konto</h2>
+            <div className="settings__rule" aria-hidden="true"></div>
+
+            <div className="settings__account">
+              {authUser.photoURL && (
+                <img src={authUser.photoURL} alt="" referrerPolicy="no-referrer" className="settings__avatar" />
+              )}
+              <div>
+                <div className="settings__name">{authUser.displayName ?? 'Eingeloggt'}</div>
+                <div className="settings__email">{authUser.email}</div>
+              </div>
+            </div>
+
+            <div className="settings__row">
+              <div className="settings__row-text">
+                <span className="settings__row-title">Fortschritt zurücksetzen</span>
+                <span className="settings__row-desc">Löscht deinen gespeicherten Lernfortschritt in allen Lektionen.</span>
+              </div>
+              <button
+                type="button"
+                className="settings__danger-btn"
+                onClick={() => {
+                  if (window.confirm('Wirklich den gesamten Fortschritt löschen? Das kann nicht rückgängig gemacht werden.')) {
+                    handleResetProgress()
+                  }
+                }}
+              >
+                Zurücksetzen
+              </button>
+            </div>
+
+            <button type="button" className="settings__logout" onClick={handleLogout}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              Abmelden
+            </button>
           </div>
         </div>
       )}
