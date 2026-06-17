@@ -275,7 +275,6 @@ export default function LandingPage() {
   const curtainRef = useRef<HTMLDivElement | null>(null)
   const curtainCanvasRef = useRef<HTMLCanvasElement | null>(null)
   const popupRef = useRef<HTMLDivElement | null>(null)
-  const popupFormRef = useRef<HTMLFormElement | null>(null)
   const signupRef = useRef<HTMLDivElement | null>(null)
   const portfolioRef = useRef<HTMLDivElement | null>(null)
   const contactFormRef = useRef<HTMLFormElement | null>(null)
@@ -966,17 +965,15 @@ export default function LandingPage() {
   }, [])
 
   /* --------------------------------------------------------------
-     Popup close handlers + form submit
+     Lessons popup close handlers (no email form anymore)
   ----------------------------------------------------------------- */
   useEffect(() => {
     const popup = popupRef.current
-    const form = popupFormRef.current
     if (!popup) return
 
     const closePopup = () => {
       popup.classList.remove('is-open')
       setPopupOpen(false)
-      window.setTimeout(() => popup.classList.remove('is-success'), 500)
     }
     const onClick = (e: Event) => {
       const target = e.target as HTMLElement
@@ -988,22 +985,13 @@ export default function LandingPage() {
         closePopup()
       }
     }
-    const onSubmit = (e: Event) => {
-      e.preventDefault()
-      if (!form) return
-      if (!validateFormCustom(form)) return
-      popup.classList.add('is-success')
-      form.reset()
-    }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && popup.classList.contains('is-open')) closePopup()
     }
     popup.addEventListener('click', onClick)
-    form?.addEventListener('submit', onSubmit)
     document.addEventListener('keydown', onKey)
     return () => {
       popup.removeEventListener('click', onClick)
-      form?.removeEventListener('submit', onSubmit)
       document.removeEventListener('keydown', onKey)
     }
   }, [])
@@ -1223,35 +1211,18 @@ export default function LandingPage() {
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
           </button>
-          <p className="popup__eyebrow">COMMUNITY</p>
+          <p className="popup__eyebrow">CURRICULUM · KAPITEL 1</p>
           <h2 className="popup__title" id="popupTitle">
-            Tritt der <em>Community</em> bei.
+            Network <em>Fundamentals</em>
           </h2>
           <p className="popup__text">
-            Bald gibt's einen Discord für alle, die hier mitlernen. Diskussion, Fragen, Lab-Setups,
-            CCNA-Tipps. Trag deine Email ein und du bist der Erste, der Bescheid bekommt.
+            Alle Lektionen visuell erklärt, Schritt für Schritt. Melde dich an, um deinen
+            Fortschritt zu speichern — für die Nutzung ist das aber nicht nötig.
           </p>
-          <form className="popup__form" ref={popupFormRef} noValidate>
-            <label htmlFor="popupEmail" className="visually-hidden">
-              Email address
-            </label>
-            <input id="popupEmail" type="email" name="email" placeholder="du@domain.com" required autoComplete="email" />
-            <button type="submit">
-              Benachrichtige mich <span aria-hidden="true">↗</span>
-            </button>
-          </form>
-          <p className="popup__hint">Kein Spam. Eine Nachricht zum Launch, das war's.</p>
-          <p className="popup__success" role="status">✓ DU BIST DABEI</p>
 
           {/* === Lessons inside the popup === */}
           <section className="popup__lessons" id="lessons-in-popup">
             <div className="popup__lessons-head">
-              <div>
-                <p className="popup__lessons-eyebrow">Curriculum · Kapitel 1</p>
-                <h3 className="popup__lessons-title">
-                  Network <em>Fundamentals</em>
-                </h3>
-              </div>
               <span className="popup__lessons-meta">
                 {lessons.length} Lektionen · {totalSteps} Steps
               </span>
@@ -1428,7 +1399,7 @@ export default function LandingPage() {
           <div className="signup__rule" aria-hidden="true"></div>
 
           <p className="signup__subtitle">
-            Sign up for early beta access.
+            Melde dich an, um deinen Lernfortschritt zu speichern. Für die Nutzung ist das nicht zwingend nötig.
           </p>
 
           <button
