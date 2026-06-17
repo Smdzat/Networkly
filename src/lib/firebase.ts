@@ -8,6 +8,7 @@
    ============================================================== */
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 import { getAnalytics, isSupported } from 'firebase/analytics'
 
 const firebaseConfig = {
@@ -23,6 +24,9 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 
 export const auth = getAuth(app)
+
+// Cloud Firestore — stores the download-app waitlist emails.
+export const db = getFirestore(app)
 
 // Always offer the Google account chooser instead of silently reusing
 // the last account — friendlier for a beta sign-up.

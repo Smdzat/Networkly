@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signInWithPopup, onAuthStateChanged, type User } from 'firebase/auth'
-import { auth, googleProvider } from '../lib/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { auth, googleProvider, db } from '../lib/firebase'
 import '../homepage.css'
 import { lessons } from '../data/lessons'
 
@@ -162,6 +163,30 @@ function validateFormCustom(form: HTMLFormElement): boolean {
   return allValid
 }
 
+/* ==============================================================
+   Email notifications via Web3Forms
+   --------------------------------------------------------------
+   Firebase can't send email on its own (needs paid Cloud Functions
+   + SMTP). Web3Forms is a free static-site form backend: we POST the
+   submission and it emails Artin.smdzat@gmail.com. Get a free access
+   key at https://web3forms.com (no account needed) and paste it below.
+   ============================================================== */
+const WEB3FORMS_KEY = '73354bfd-014e-4319-a9cd-060de66d249c'
+
+async function sendEmailNotification(fields: Record<string, string>): Promise<void> {
+  if (!WEB3FORMS_KEY || WEB3FORMS_KEY.startsWith('PASTE_')) {
+    // Key not set yet — skip silently so the UI flow still works.
+    console.warn('[Networkly] Web3Forms key not set — email not sent.')
+    return
+  }
+  const res = await fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, ...fields }),
+  })
+  if (!res.ok) throw new Error('Web3Forms request failed')
+}
+
 function TopicPicker({ onOpenLessons }: TopicPickerProps) {
   const [active, setActive] = useState<string>(TOPICS[0].key)
   const current = TOPICS.find(t => t.key === active) ?? TOPICS[0]
@@ -227,6 +252,11 @@ export default function LandingPage() {
   // Legal modal (Datenschutz / Nutzungsbedingungen)
   const [legalDoc, setLegalDoc] = useState<'privacy' | 'terms' | null>(null)
   const [legalClosing, setLegalClosing] = useState(false)
+  // "Get notified" download waitlist popup
+  const [notifyOpen, setNotifyOpen] = useState(false)
+  const [notifyClosing, setNotifyClosing] = useState(false)
+  const [notifyStatus, setNotifyStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const notifyInputRef = useRef<HTMLInputElement | null>(null)
 
   // Refs for elements the JS effects need to grab.
   const navRef = useRef<HTMLElement | null>(null)
@@ -370,6 +400,71 @@ export default function LandingPage() {
       window.scrollTo(0, scrollY)
     }
   }, [legalDoc])
+
+  /* --------------------------------------------------------------
+     "Get notified" download waitlist popup — open/close + submit
+  ----------------------------------------------------------------- */
+  const openNotify = () => {
+    setNotifyClosing(false)
+    setNotifyStatus('idle')
+    setNotifyOpen(true)
+  }
+  const closeNotify = () => {
+    setNotifyClosing(true)
+    window.setTimeout(() => {
+      setNotifyOpen(false)
+      setNotifyClosing(false)
+      setNotifyStatus('idle')
+    }, 240)
+  }
+
+  const handleNotifySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const email = notifyInputRef.current?.value.trim()
+    if (!email) return
+    setNotifyStatus('loading')
+    // 1) Best-effort: store the email in Firestore (so you have the list).
+    try {
+      await addDoc(collection(db, 'download-waitlist'), {
+        email,
+        createdAt: serverTimestamp(),
+        source: 'download-notify',
+      })
+    } catch (err) {
+      console.warn('[Networkly] Firestore write skipped:', err)
+    }
+    // 2) Email Artin via Web3Forms.
+    try {
+      await sendEmailNotification({
+        subject: 'Networkly — Neue Download-Waitlist Anmeldung',
+        from_name: 'Networkly Waitlist',
+        email,
+        message: `Neue Anmeldung für die Desktop-App Waitlist:\n\n${email}`,
+      })
+      setNotifyStatus('done')
+    } catch {
+      setNotifyStatus('error')
+    }
+  }
+
+  useEffect(() => {
+    if (!notifyOpen) return
+    const scrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.width = '100%'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeNotify()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      window.scrollTo(0, scrollY)
+    }
+  }, [notifyOpen])
 
   /* --------------------------------------------------------------
      Lesson totals (used in the popup header)
@@ -678,9 +773,19 @@ export default function LandingPage() {
       e.preventDefault()
       if (!form) return
       if (!validateFormCustom(form)) return
-      // Let the send-btn focus animation play first (plane flies away,
-      // letters drop, "Sent" check fades in) — total ~2.5s — then switch
-      // to the "sent" portfolio view.
+      // Fire the email off to Artin via Web3Forms. We don't block the
+      // animation on the network — the send-btn focus animation plays
+      // (~2.5s) and we switch to the "sent" view regardless, so the UX
+      // stays smooth even on a slow connection.
+      const data = new FormData(form)
+      void sendEmailNotification({
+        subject: 'Networkly — Neue Kontakt-Nachricht',
+        from_name: String(data.get('name') || 'Website Kontakt'),
+        email: String(data.get('email') || ''),
+        message: String(data.get('message') || ''),
+      }).catch(() => {
+        /* swallow — the visual confirmation already played */
+      })
       window.setTimeout(() => switchTo('sent'), 2600)
     }
     // Listen on the document so triggers outside the portfolio block (footer
@@ -1307,17 +1412,12 @@ export default function LandingPage() {
             <button
               type="button"
               className="nav__download"
-              onClick={(e) => {
-                const btn = e.currentTarget
-                btn.classList.add('is-notified')
-                window.setTimeout(() => btn.classList.remove('is-notified'), 2200)
-              }}
+              onClick={openNotify}
             >
               <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
                 <path d="M0 3.5l9.9-1.4v9.5H0V3.5zm11.1-1.6L24 0v11.6H11.1V1.9zM24 12.4v11.5l-12.9-1.8V12.4H24zM9.9 22l-9.9-1.4v-8.2h9.9V22z"/>
               </svg>
-              <span className="nav__download-label">Download</span>
-              <span className="nav__download-soon">Soon</span>
+              <span>Download</span>
             </button>
 
             <a href="#" className="nav__signin" data-curtain data-popup="signup">
@@ -1385,17 +1485,12 @@ export default function LandingPage() {
             <button
               type="button"
               className="hero__cta hero__cta--outline"
-              onClick={(e) => {
-                const btn = e.currentTarget
-                btn.classList.add('is-notified')
-                window.setTimeout(() => btn.classList.remove('is-notified'), 2400)
-              }}
+              onClick={openNotify}
             >
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
                 <path d="M0 3.5l9.9-1.4v9.5H0V3.5zm11.1-1.6L24 0v11.6H11.1V1.9zM24 12.4v11.5l-12.9-1.8V12.4H24zM9.9 22l-9.9-1.4v-8.2h9.9V22z"/>
               </svg>
-              <span className="hero__download-label">Download für Windows</span>
-              <span className="hero__download-soon">Coming soon</span>
+              <span>Download für Windows</span>
             </button>
           </div>
         </div>
@@ -1780,17 +1875,12 @@ export default function LandingPage() {
                 <button
                   type="button"
                   className="footer__download-btn"
-                  onClick={(e) => {
-                    const btn = e.currentTarget
-                    btn.classList.add('is-notified')
-                    window.setTimeout(() => btn.classList.remove('is-notified'), 2400)
-                  }}
+                  onClick={openNotify}
                 >
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
                     <path d="M0 3.5l9.9-1.4v9.5H0V3.5zm11.1-1.6L24 0v11.6H11.1V1.9zM24 12.4v11.5l-12.9-1.8V12.4H24zM9.9 22l-9.9-1.4v-8.2h9.9V22z"/>
                   </svg>
                   <span className="footer__download-label">Download für Windows</span>
-                  <span className="footer__download-soon">Coming soon — get notified</span>
                 </button>
               </div>
             </div>
@@ -1853,6 +1943,79 @@ export default function LandingPage() {
                 </ul>
                 <p className="legal__meta">Stand: 2026 · Built solo in Austria.</p>
               </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* "Get notified" download waitlist popup */}
+      {notifyOpen && (
+        <div
+          className={`notify${notifyClosing ? ' is-closing' : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="notifyTitle"
+        >
+          <div className="notify__backdrop" onClick={closeNotify}></div>
+          <div className="notify__panel" role="document">
+            <button className="notify__close" type="button" aria-label="Schließen" onClick={closeNotify}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+
+            <div className="notify__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M0 3.5l9.9-1.4v9.5H0V3.5zm11.1-1.6L24 0v11.6H11.1V1.9zM24 12.4v11.5l-12.9-1.8V12.4H24zM9.9 22l-9.9-1.4v-8.2h9.9V22z"/>
+              </svg>
+            </div>
+
+            {notifyStatus === 'done' ? (
+              <>
+                <h2 className="notify__title">Du stehst auf der Liste ✓</h2>
+                <p className="notify__text">
+                  Wir melden uns bei dir, sobald die Desktop-App zum Download bereit ist. Danke fürs Interesse!
+                </p>
+                <button type="button" className="notify__submit" onClick={closeNotify}>
+                  Schließen
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="notify__eyebrow">DESKTOP-APP · COMING SOON</p>
+                <h2 className="notify__title" id="notifyTitle">Werde benachrichtigt</h2>
+                <p className="notify__text">
+                  Die Networkly Desktop-App ist in Arbeit. Trag deine Email ein und du
+                  erfährst als Erster, wenn sie zum Download bereit ist.
+                </p>
+
+                <form className="notify__form" onSubmit={handleNotifySubmit} noValidate>
+                  <input
+                    ref={notifyInputRef}
+                    type="email"
+                    name="email"
+                    placeholder="du@domain.com"
+                    required
+                    autoComplete="email"
+                    disabled={notifyStatus === 'loading'}
+                  />
+                  <button type="submit" className="notify__submit" disabled={notifyStatus === 'loading'}>
+                    {notifyStatus === 'loading' ? 'Wird gesendet…' : 'Benachrichtige mich'}
+                    {notifyStatus !== 'loading' && (
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                    )}
+                  </button>
+                </form>
+
+                {notifyStatus === 'error' && (
+                  <p className="notify__error" role="alert">
+                    Etwas ist schiefgelaufen. Bitte versuch es nochmal.
+                  </p>
+                )}
+                <p className="notify__hint">Kein Spam. Eine Nachricht zum Launch, das war's.</p>
+              </>
             )}
           </div>
         </div>

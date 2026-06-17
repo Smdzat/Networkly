@@ -4064,3 +4064,192 @@ body.is-homepage ::selection {
         gap: 36px;
     }
 }
+
+
+/* ================================
+   "Get notified" download waitlist popup
+================================ */
+.notify {
+    position: fixed;
+    inset: 0;
+    z-index: 9600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.notify__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 6, 6, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: notify-backdrop-in 0.28s ease both;
+}
+
+.notify__panel {
+    position: relative;
+    z-index: 1;
+    width: min(92vw, 440px);
+    background: rgba(12, 12, 14, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+    padding: 36px 32px 30px;
+    text-align: center;
+    animation: notify-panel-in 0.3s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.notify.is-closing .notify__backdrop {
+    animation: notify-backdrop-in 0.22s ease reverse both;
+}
+.notify.is-closing .notify__panel {
+    animation: notify-panel-in 0.22s ease reverse both;
+}
+
+@keyframes notify-backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes notify-panel-in {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.notify__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+.notify__close:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.notify__icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 20px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+.notify__eyebrow {
+    font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 0 10px;
+}
+
+.notify__title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: #ffffff;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+}
+
+.notify__text {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 24px;
+}
+
+.notify__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notify__form input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: #ffffff;
+    font: inherit;
+    font-size: 16px;
+    font-family: 'Inter', system-ui, sans-serif;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+.notify__form input::placeholder {
+    color: rgba(255, 255, 255, 0.28);
+}
+.notify__form input:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.notify__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 22px;
+    border: none;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #0a0a0a;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.notify__submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.16);
+}
+.notify__submit:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.notify__error {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: #f87171;
+    margin: 12px 0 0;
+}
+
+.notify__hint {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.32);
+    margin: 14px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notify__backdrop,
+    .notify__panel,
+    .notify.is-closing .notify__backdrop,
+    .notify.is-closing .notify__panel {
+        animation: none;
+    }
+}
