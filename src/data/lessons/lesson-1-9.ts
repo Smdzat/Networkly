@@ -59,7 +59,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'GUA Struktur',
-            content: 'Global Unicast: 2000::/3\n\nAufbau einer /64 GUA:\n• /23 – IANA → RIR (RIPE, ARIN...)\n• /32 – RIR → ISP\n• /48 – ISP → Kunde (Site)\n• /64 – Kunde → Subnetz\n• Interface-ID (64 Bit) → Host\n\nBeispiel: 2001:0db8:0001:000A::10/64\n• 2001:0db8 → ISP-Block\n• 0001 → Site\n• 000A → Subnetz 10\n• ::10 → Host',
+            content: 'Global Unicast: 2000::/3\n\nAufbau einer /64 GUA:\n• /12 – IANA → RIR (RIPE, ARIN...)\n• /32 – RIR → ISP\n• /48 – ISP → Kunde (Site)\n• /64 – Kunde → Subnetz\n• Interface-ID (64 Bit) → Host\n\nBeispiel: 2001:0db8:0001:000A::10/64\n• 2001:0db8 → ISP-Block\n• 0001 → Site\n• 000A → Subnetz 10\n• ::10 → Host',
           },
         },
       ],
@@ -71,7 +71,7 @@ const lesson: Lesson = {
         {
           title: 'Unique Local: Privat wie bei IPv4',
           description:
-            'Unique Local Adressen (ULA, fd00::/8) sind das IPv6-Pendant zu RFC 1918 (privaten IPv4-Adressen). Sie werden nicht im Internet geroutet, funktionieren aber in deinem internen Netzwerk — zwischen Standorten über VPN zum Beispiel.',
+            'Unique Local Adressen (ULA, fc00::/7 — in der Praxis nutzt man die Hälfte fd00::/8) sind das IPv6-Pendant zu RFC 1918 (privaten IPv4-Adressen). Sie werden nicht im Internet geroutet, funktionieren aber in deinem internen Netzwerk — zwischen Standorten über VPN zum Beispiel.',
           analogy: 'Wie eine Durchwahl im Büro — intern erreichbar, aber nicht von außen anrufbar.',
           scene: {
             devices: [
@@ -172,7 +172,7 @@ const lesson: Lesson = {
         {
           title: 'Multicast: Einmal senden, viele empfangen',
           description:
-            'Multicast (ff00::/8) schickt ein Paket an eine Gruppe von Empfängern. IPv6 hat KEINEN Broadcast — stattdessen Multicast-Gruppen. Wichtige Gruppen: ff02::1 (alle Nodes), ff02::2 (alle Router), ff02::1:ff (Solicited-Node für NDP).',
+            'Multicast (ff00::/8) schickt ein Paket an eine Gruppe von Empfängern. IPv6 hat KEINEN Broadcast — stattdessen Multicast-Gruppen. Wichtige Gruppen: ff02::1 (alle Nodes), ff02::2 (alle Router), ff02::1:ffXX:XXXX (Solicited-Node für NDP).',
           analogy: 'Wie ein Gruppen-Chat: Nur die Mitglieder der Gruppe bekommen die Nachricht.',
           scene: {
             devices: [
@@ -203,7 +203,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Wichtige Multicast-Gruppen',
-            content: 'ff02::1 — All Nodes (alle Geräte am Link)\nff02::2 — All Routers (nur Router)\nff02::5 — OSPF Routers\nff02::6 — OSPF Designated Routers\nff02::9 — RIPng Routers\nff02::a — EIGRP Routers\nff02::1:ff — Solicited-Node (für NDP/DAD)\n\nScope (2. Hex-Ziffer):\n• ff01:: — Interface-Local\n• ff02:: — Link-Local (häufigster)\n• ff05:: — Site-Local\n• ff0e:: — Global',
+            content: 'ff02::1 — All Nodes (alle Geräte am Link)\nff02::2 — All Routers (nur Router)\nff02::5 — OSPF Routers\nff02::6 — OSPF Designated Routers\nff02::9 — RIPng Routers\nff02::a — EIGRP Routers\nff02::1:ffXX:XXXX — Solicited-Node (für NDP/DAD)\n\nScope (2. Hex-Ziffer):\n• ff01:: — Interface-Local\n• ff02:: — Link-Local (häufigster)\n• ff05:: — Site-Local\n• ff0e:: — Global',
           },
         },
       ],
@@ -219,7 +219,7 @@ const lesson: Lesson = {
           analogy: 'Wie ein Namensgenerator: Aus deinem Spitznamen (MAC) wird ein voller Benutzername (Interface-ID) nach festen Regeln.',
           scene: {
             devices: [
-              { id: 'pc', type: 'pc', label: 'MAC: 00:1A:2B:3C:4D:5E\n→ EUI-64: 021A:2BFF:FE3C:4D5E\n→ IPv6: 2001:db8::21a:2bff:fe3c:4d5e', position: { x: 130, y: 270 } },
+              { id: 'pc', type: 'pc', label: 'MAC: 00:1A:2B:3C:4D:5E\n→ EUI-64: 021A:2BFF:FE3C:4D5E\n→ IPv6: 2001:db8:0:1:21a:2bff:fe3c:4d5e', position: { x: 130, y: 270 } },
               { id: 'sw', type: 'switch', label: 'Switch', position: { x: 600, y: 270 } },
               { id: 'router', type: 'router', label: 'Router\nSLAAC + RA', position: { x: 820, y: 270 } },
             ],

@@ -39,7 +39,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'CSMA/CD im Detail',
-            content: 'Carrier Sense Multiple Access / Collision Detection:\n\n1. CS: Ist die Leitung frei? → Ja: Sende!\n2. MA: Mehrere Geräte dürfen senden\n3. CD: Kollision erkannt?\n   → Jam-Signal senden (alle stoppen)\n   → Zufällig warten (Backoff-Timer)\n   → Erneut versuchen (max. 16x)\n\nshow interface Fa0/1:\n• collisions: 0 (gut)\n• late collisions: 0 (schlecht wenn > 0, deutet auf Kabelproblem)',
+            content: 'Carrier Sense Multiple Access / Collision Detection:\n\n1. CS: Ist die Leitung frei? → Ja: Sende!\n2. MA: Mehrere Geräte dürfen senden\n3. CD: Kollision erkannt?\n   → Jam-Signal senden (alle stoppen)\n   → Zufällig warten (Backoff-Timer)\n   → Erneut versuchen (max. 16x)\n\nshow interface Fa0/1:\n• collisions: 0 (gut)\n• late collisions: 0 (schlecht wenn > 0 — meist Duplex-Mismatch, seltener zu langes Kabel/Segment)',
           },
         },
         {
@@ -160,8 +160,8 @@ const lesson: Lesson = {
           analogy: 'Wie ein Telefonat, bei dem einer denkt, es ist ein Walkie-Talkie — beide unterbrechen sich ständig.',
           scene: {
             devices: [
-              { id: 'pc1', type: 'pc', label: 'PC\nauto → Half-Duplex\nauto → 100 Mbit', position: { x: 80, y: 270 } },
-              { id: 'sw', type: 'switch', label: 'Switch Port Fa0/1\nfest: Full-Duplex\nfest: 1 Gbit', position: { x: 380, y: 270 } },
+              { id: 'pc1', type: 'pc', label: 'PC\nauto → fällt auf Half-Duplex\n100 Mbit', position: { x: 80, y: 270 } },
+              { id: 'sw', type: 'switch', label: 'Switch Port Fa0/1\nfest: Full-Duplex\nfest: 100 Mbit', position: { x: 380, y: 270 } },
               { id: 'sw2', type: 'switch', label: 'Core Switch\nauto/auto ✓', position: { x: 650, y: 170 } },
               { id: 'server', type: 'server', label: 'Server\nauto/auto ✓', position: { x: 650, y: 380 } },
             ],
@@ -176,7 +176,7 @@ const lesson: Lesson = {
                 label: 'Late Coll!',
                 color: '#f87171',
                 hops: [
-                  { fromDevice: 'pc1', toDevice: 'sw', hint: 'PC sendet im Half-Duplex-Modus, der Switch erwartet aber Full-Duplex. Beide reden gleichzeitig → Late Collision. Verbindung läuft, aber miserabel langsam.' },
+                  { fromDevice: 'pc1', toDevice: 'sw', hint: 'Der Switch-Port ist fest auf 100 Mbit/Full-Duplex. Der PC steht auf "auto", bekommt aber keinen Negotiation-Partner und fällt per Parallel-Detection auf 100 Mbit/Half-Duplex zurück. Eine Seite Full, eine Half → Late Collisions, Verbindung läuft, aber miserabel langsam.' },
                 ],
               },
             ],
@@ -184,7 +184,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Auto-Negotiation Regeln',
-            content: 'Beide Seiten auf "auto" → Funktioniert immer ✓\nBeide fest gleich konfiguriert → Funktioniert ✓\nEine Seite fest, andere "auto" → PROBLEM!\n\nWas passiert bei Mismatch:\n• Fest: Full-Duplex 1G\n• Auto: Erkennt Speed (1G), aber Duplex fällt auf Half zurück\n→ Late Collisions, CRC Errors, Paketverlust\n\nLösung: Beide Seiten auf "auto" oder beide gleich fest konfigurieren.\n\nshow interfaces Fa0/1:\n  Full-duplex, 1000Mb/s ← Ist das korrekt?',
+            content: 'Beide Seiten auf "auto" → Funktioniert immer ✓\nBeide fest gleich konfiguriert → Funktioniert ✓\nEine Seite fest, andere "auto" → PROBLEM!\n\nWas passiert bei Mismatch (10/100):\n• Fest: 100 Mbit / Full-Duplex\n• Auto: erkennt per Parallel-Detection nur den Speed (100M), Duplex fällt auf Half zurück\n→ eine Seite Full, andere Half → Late Collisions, CRC Errors, Paketverlust\n\n⚠ Klassischer Duplex-Mismatch ist ein 10/100-Phänomen. Gigabit (1000BASE-T) erzwingt Auto-Negotiation — dort tritt er praktisch nicht auf.\n\nLösung: Beide Seiten auf "auto" oder beide gleich fest konfigurieren.\n\nshow interfaces Fa0/1:\n  Half-duplex, 100Mb/s ← passt das zur Gegenseite?',
           },
         },
         {

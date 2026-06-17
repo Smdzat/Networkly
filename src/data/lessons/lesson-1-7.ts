@@ -89,7 +89,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'RFC 1918 — Private Bereiche',
-            content: 'Klasse A: 10.0.0.0/8\n→ 10.0.0.0 – 10.255.255.255\n→ 16.777.214 Hosts\n→ Großunternehmen, Datacenter\n\nKlasse B: 172.16.0.0/12\n→ 172.16.0.0 – 172.31.255.255\n→ 1.048.574 Hosts\n→ Mittelständische Unternehmen\n\nKlasse C: 192.168.0.0/16\n→ 192.168.0.0 – 192.168.255.255\n→ 65.534 Hosts\n→ Heimnetzwerke, kleine Büros\n\nWeitere spezielle Bereiche:\n• 127.0.0.0/8 — Loopback\n• 169.254.0.0/16 — APIPA (kein DHCP)\n• 100.64.0.0/10 — Carrier-Grade NAT',
+            content: 'Klasse-A-Block: 10.0.0.0/8\n→ 10.0.0.0 – 10.255.255.255\n→ 16.777.214 Hosts (ein Klasse-A-Netz)\n→ Großunternehmen, Datacenter\n\nKlasse-B-Block: 172.16.0.0/12\n→ 172.16.0.0 – 172.31.255.255\n→ 1.048.574 Hosts (= 16 Klasse-B-Netze)\n→ Mittelständische Unternehmen\n\nKlasse-C-Block: 192.168.0.0/16\n→ 192.168.0.0 – 192.168.255.255\n→ 65.534 Hosts (= 256 Klasse-C-Netze)\n→ Heimnetzwerke, kleine Büros\n\nWeitere spezielle Bereiche:\n• 127.0.0.0/8 — Loopback\n• 169.254.0.0/16 — APIPA (kein DHCP)\n• 100.64.0.0/10 — Carrier-Grade NAT',
           },
         },
       ],

@@ -82,7 +82,7 @@ const lesson: Lesson = {
         {
           title: 'TCP/IP: Das Modell des Internets',
           description:
-            'Das OSI-Modell ist die saubere Theorie aus dem Lehrbuch — das TCP/IP-Modell ist die echte Welt da draußen. Es fasst die 7 OSI-Schichten zu 4 zusammen, weil in der Praxis Layer 5 und 6 nicht klar trennbar sind. Das gesamte Internet, jede Webseite, jede E-Mail, jeder Stream läuft über TCP/IP — nicht über OSI. Trotzdem reden Netzwerker im Alltag in OSI-Begriffen ("Layer-3-Switch", "Layer-2-Problem"), weil OSI die feinere Struktur liefert.',
+            'Das OSI-Modell ist die saubere Theorie aus dem Lehrbuch — das TCP/IP-Modell ist die echte Welt da draußen. Es fasst die 7 OSI-Schichten zu 4 zusammen: die oberen drei (Session, Presentation, Application) werden zu einer einzigen Application-Schicht, weil sie in der Praxis ohnehin gemeinsam in der Anwendung umgesetzt werden. Das gesamte Internet, jede Webseite, jede E-Mail, jeder Stream läuft über TCP/IP — nicht über OSI. Trotzdem reden Netzwerker im Alltag in OSI-Begriffen ("Layer-3-Switch", "Layer-2-Problem"), weil OSI die feinere Struktur liefert.',
           analogy: 'OSI = der detaillierte Architekturplan im Schrank. TCP/IP = das Haus, das tatsächlich gebaut wurde. Beide passen zusammen, aber gewohnt wird in TCP/IP.',
           scene: {
             customOverlay: {
@@ -91,8 +91,8 @@ const lesson: Lesson = {
               layerWalk: [
                 'Layer 4 — Application: Was du als User tust. Browser ruft eine Webseite auf, E-Mail-Client schickt eine Mail, SSH öffnet eine Shell. HTTP, DNS, SMTP, FTP, SSH leben hier.',
                 'Layer 3 — Transport: Liefert die Daten zuverlässig oder schnell. TCP macht alles mit Bestätigung und in richtiger Reihenfolge. UDP feuert los und hofft. Port-Nummern wie :80 oder :53 stehen hier drin.',
-                'Layer 2 — Internet: Die Welt der IP-Adressen. Hier entscheidet sich der Weg deines Pakets durchs Netz — über welche Router es geht, welche Hops es nimmt. ICMP (Ping), ARP, OSPF leben hier.',
-                'Layer 1 — Network Access: Die letzte Meile. Frames mit MAC-Adressen, das Kabel, das WLAN-Signal. Hier sitzt Ethernet, Wi-Fi, PPP — alles was Bits physisch transportiert.',
+                'Layer 2 — Internet: Die Welt der IP-Adressen. Hier entscheidet sich der Weg deines Pakets durchs Netz — über welche Router es geht, welche Hops es nimmt. ICMP (Ping), OSPF leben hier.',
+                'Layer 1 — Network Access: Die letzte Meile. Frames mit MAC-Adressen, das Kabel, das WLAN-Signal. Hier sitzt Ethernet, Wi-Fi, PPP und ARP (IP→MAC) — alles was die Zustellung im lokalen Netz erledigt.',
               ],
             },
             devices: [],
@@ -100,7 +100,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'OSI vs. TCP/IP Vergleich',
-            content: 'TCP/IP-Modell → OSI-Äquivalent:\n\n4. Application → Layer 7+6+5\n   HTTP, DNS, SMTP, FTP, SSH\n\n3. Transport → Layer 4\n   TCP (zuverlässig), UDP (schnell)\n\n2. Internet → Layer 3\n   IP, ICMP, ARP, OSPF, BGP\n\n1. Network Access → Layer 2+1\n   Ethernet, Wi-Fi, PPP, Kabel\n\n⚠ In der Praxis sagt man trotzdem "Layer 3 Switch" — OSI-Begriffe sind Standard im Alltag.',
+            content: 'TCP/IP-Modell → OSI-Äquivalent:\n\n4. Application → Layer 7+6+5\n   HTTP, DNS, SMTP, FTP, SSH\n\n3. Transport → Layer 4\n   TCP (zuverlässig), UDP (schnell)\n\n2. Internet → Layer 3\n   IP, ICMP, OSPF, BGP\n\n1. Network Access → Layer 2+1\n   Ethernet, Wi-Fi, PPP, ARP, Kabel\n\n⚠ In der Praxis sagt man trotzdem "Layer 3 Switch" — OSI-Begriffe sind Standard im Alltag.',
           },
         },
         {
@@ -128,8 +128,8 @@ const lesson: Lesson = {
                 label: 'HTTPS',
                 color: '#60a5fa',
                 hops: [
-                  { fromDevice: 'user', toDevice: 'sw', hint: '① Application: Browser erstellt HTTPS-Request ② Transport: TCP-Verbindung (Port 443) ③ Internet: Ziel-IP 142.250.80.46 ④ Network Access: Frame mit MAC-Adresse des Switches' },
-                  { fromDevice: 'sw', toDevice: 'r1', hint: 'Der Switch (Layer 2) liest den Frame-Header → MAC-Adresse des Routers → leitet auf den richtigen Port weiter' },
+                  { fromDevice: 'user', toDevice: 'sw', hint: '① Application: Browser erstellt HTTPS-Request ② Transport: TCP-Verbindung (Port 443) ③ Internet: Ziel-IP 142.250.80.46 ④ Network Access: Frame mit Ziel-MAC = Default-Gateway (Router), denn google.de liegt außerhalb deines Netzes' },
+                  { fromDevice: 'sw', toDevice: 'r1', hint: 'Der Switch (Layer 2) liest die Ziel-MAC im Frame (= MAC des Routers) und leitet auf den richtigen Port weiter — der Switch selbst ist dabei nur Durchgang, nie Ziel.' },
                   { fromDevice: 'r1', toDevice: 'r2', hint: 'Der Router (Layer 3) öffnet den Frame, liest das IP-Paket, schaut in die Routing-Tabelle → nächster Hop: ISP-Router' },
                   { fromDevice: 'r2', toDevice: 'google', hint: 'Der ISP-Router leitet über das Backbone zu Google. Der Server packt alle Schichten aus und verarbeitet die Anfrage.' },
                 ],
@@ -185,7 +185,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Protokolle pro Layer',
-            content: 'Layer 7 (Application):\n• HTTP/HTTPS — Webseiten\n• DNS — Namensauflösung\n• SMTP/POP3/IMAP — E-Mail\n• FTP/SFTP — Dateitransfer\n• SSH — sichere Fernsteuerung\n• DHCP — automatische IP-Vergabe\n\nLayer 4 (Transport):\n• TCP — zuverlässig, mit Bestätigung\n• UDP — schnell, ohne Bestätigung\n\nLayer 3 (Network):\n• IPv4 / IPv6 — Adressierung\n• ICMP — Ping, Traceroute\n• OSPF, EIGRP, BGP — Routing\n• ARP — IP → MAC auflösen\n\nLayer 2 (Data Link):\n• Ethernet (802.3)\n• Wi-Fi (802.11)\n• PPP — serielle Verbindungen\n\nLayer 1 (Physical):\n• Kupfer, Glasfaser, Funk',
+            content: 'Layer 7 (Application):\n• HTTP/HTTPS — Webseiten\n• DNS — Namensauflösung\n• SMTP/POP3/IMAP — E-Mail\n• FTP/SFTP — Dateitransfer\n• SSH — sichere Fernsteuerung\n• DHCP — automatische IP-Vergabe\n\nLayer 4 (Transport):\n• TCP — zuverlässig, mit Bestätigung\n• UDP — schnell, ohne Bestätigung\n\nLayer 3 (Network):\n• IPv4 / IPv6 — Adressierung\n• ICMP — Ping, Traceroute\n• OSPF, EIGRP, BGP — Routing\n\nLayer 2 (Data Link):\n• Ethernet (802.3)\n• Wi-Fi (802.11)\n• PPP — serielle Verbindungen\n• ARP — IP → MAC auflösen\n\nLayer 1 (Physical):\n• Kupfer, Glasfaser, Funk',
           },
         },
       ],

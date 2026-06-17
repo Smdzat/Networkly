@@ -215,7 +215,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'TCP vs. UDP — Vollständige Übersicht',
-            content: 'TCP-Protokolle:\n• HTTP/HTTPS :80/:443 — Web\n• FTP :20/:21 — Dateien\n• SSH :22 — Sicherer Zugang\n• Telnet :23 — Unsicherer Zugang\n• SMTP :25 — E-Mail senden\n• POP3 :110 — E-Mail empfangen\n\nUDP-Protokolle:\n• DNS :53 — Namensauflösung\n• DHCP :67/:68 — IP vergeben\n• TFTP :69 — Einfacher Dateitransfer\n• SNMP :161 — Monitoring\n• RTP — Voice/Video\n• QUIC :443 — Modernes HTTP/3\n\nBeide: DNS (:53), LDAP (:389)',
+            content: 'TCP-Protokolle:\n• HTTP/HTTPS :80/:443 — Web\n• FTP :20/:21 — Dateien\n• SSH :22 — Sicherer Zugang\n• Telnet :23 — Unsicherer Zugang\n• SMTP :25 — E-Mail senden\n• POP3 :110 — E-Mail empfangen\n• LDAP :389 — Verzeichnisdienst\n\nUDP-Protokolle:\n• DHCP :67/:68 — IP vergeben\n• TFTP :69 — Einfacher Dateitransfer\n• SNMP :161 — Monitoring\n• RTP — Voice/Video\n• QUIC :443 — Modernes HTTP/3\n\nBeide (TCP & UDP): DNS (:53)\n→ Abfragen meist per UDP, Zone-Transfer & große Antworten per TCP',
           },
         },
       ],

@@ -131,7 +131,7 @@ const lesson: Lesson = {
         {
           title: 'Spine-Leaf: Moderne Datacenter-Architektur',
           description:
-            'In Rechenzentren nutzt man Spine-Leaf: Jeder Leaf-Switch (unten) ist mit JEDEM Spine-Switch (oben) verbunden. Egal welchen Weg ein Paket nimmt — es braucht immer genau 2 Hops. Das ist berechenbar, hochredundant und ultra schnell.',
+            'In Rechenzentren nutzt man Spine-Leaf: Jeder Leaf-Switch (unten) ist mit JEDEM Spine-Switch (oben) verbunden. Server in unterschiedlichen Racks sind dadurch immer gleich weit voneinander entfernt — genau ein Spine-Switch dazwischen. (Nur Server am selben Leaf erreichen sich direkt.) Das macht die Latenz berechenbar, hochredundant und ultra schnell.',
           analogy: 'Wie ein Flughafen-Netzwerk: Von jedem Gate (Leaf) kommst du über genau einen Flur (Spine) zu jedem anderen Gate.',
           scene: {
             devices: [
@@ -173,7 +173,7 @@ const lesson: Lesson = {
                 hops: [
                   { fromDevice: 'srv1', toDevice: 'leaf1', hint: 'Web-Cluster braucht Daten von der Database. Server schickt Frame an seinen Top-of-Rack Leaf-Switch — direkter Anschluss, 25G.' },
                   { fromDevice: 'leaf1', toDevice: 'spine2', hint: 'Leaf 1 hat drei Pfade nach oben (Spine 1, 2, 3). ECMP wählt einen — hier Spine 2. Bei nächstem Flow vielleicht Spine 1 oder 3, alle gleich gut.' },
-                  { fromDevice: 'spine2', toDevice: 'leaf3', hint: 'Spine 2 routet runter zu Leaf 3. Spine spricht NUR mit Leafs, nie mit anderen Spines. Vorhersehbare Latenz: immer genau 2 Hops zwischen beliebigen Servern.' },
+                  { fromDevice: 'spine2', toDevice: 'leaf3', hint: 'Spine 2 routet runter zu Leaf 3. Spine spricht NUR mit Leafs, nie mit anderen Spines. Vorhersehbare Latenz: zwischen Servern in verschiedenen Racks liegt immer genau ein Spine — gleiche Distanz für alle.' },
                   { fromDevice: 'leaf3', toDevice: 'srv3', hint: 'Leaf 3 liefert an den Database-Server in Rack C. Fällt ein Spine aus, übernehmen die anderen — ECMP verteilt den Traffic automatisch um.' },
                 ],
               },
@@ -194,7 +194,7 @@ const lesson: Lesson = {
         {
           title: 'WAN: Das Weitverkehrsnetz',
           description:
-            'Ein WAN (Wide Area Network) verbindet weit entfernte Standorte — z.B. Büros in verschiedenen Städten. Über MPLS, VPN-Tunnel oder SD-WAN wird ein sicherer Datenaustausch über das Internet ermöglicht.',
+            'Ein WAN (Wide Area Network) verbindet weit entfernte Standorte — z.B. Büros in verschiedenen Städten. Dafür gibt es verschiedene Techniken: MPLS ist ein privates, vom Provider verwaltetes Netz (nicht über das offene Internet). VPN-Tunnel (z.B. IPsec) verschlüsseln die Daten und laufen über das normale Internet. SD-WAN bündelt mehrere Leitungen intelligent. So werden entfernte LANs zu einem zusammenhängenden Netzwerk.',
           analogy: 'LAN = dein Büro in einem Gebäude. WAN = die Autobahn zwischen Büros in verschiedenen Städten.',
           scene: {
             devices: [

@@ -13,7 +13,7 @@ const lesson: Lesson = {
         {
           title: 'Wi-Fi Kanäle: Wie Radio-Frequenzen',
           description:
-            'WLAN nutzt Funkfrequenzen — wie verschiedene Radiosender. Im 2.4-GHz-Band gibt es 14 Kanäle, aber nur 3 überlappen sich nicht: 1, 6 und 11. Im 5-GHz-Band gibt es 23+ nicht-überlappende Kanäle. Bei Enterprise-Deployments plant man die Kanalverteilung sorgfältig.',
+            'WLAN nutzt Funkfrequenzen — wie verschiedene Radiosender. Im 2.4-GHz-Band gibt es je nach Land bis zu 13 nutzbare Kanäle (Kanal 14 nur in Japan), aber nur 3 überlappen sich nicht: 1, 6 und 11. Im 5-GHz-Band gibt es über 20 nicht-überlappende Kanäle. Bei Enterprise-Deployments plant man die Kanalverteilung sorgfältig.',
           analogy: 'Wie Radiosender: Wenn zwei auf fast der gleichen Frequenz senden, hörst du ein Durcheinander.',
           scene: {
             devices: [
@@ -44,7 +44,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Kanalplanung',
-            content: '2.4 GHz (802.11b/g/n):\n• 14 Kanäle, je 22 MHz breit\n• Nur 1, 6, 11 nicht überlappend\n• Max ~150 Mbit/s (n)\n\n5 GHz (802.11a/n/ac/ax):\n• 23+ nicht-überlappende Kanäle\n• Je 20/40/80/160 MHz breit\n• Max ~9,6 Gbit/s (ax)\n\n6 GHz (802.11ax / Wi-Fi 6E):\n• 59 neue Kanäle!\n• Weniger Interferenz\n\nRegel: Benachbarte APs → unterschiedliche Kanäle',
+            content: '2.4 GHz (802.11b/g/n):\n• Kanäle 1-13 (14 nur Japan/802.11b) — regionsabhängig\n• 20 MHz breit (nur 802.11b: 22 MHz)\n• Nur 1, 6, 11 nicht überlappend\n• Max ~300 Mbit/s (n, 2 Streams)\n\n5 GHz (802.11a/n/ac/ax):\n• 23+ nicht-überlappende Kanäle\n• Je 20/40/80/160 MHz breit\n• Max ~9,6 Gbit/s (ax)\n\n6 GHz (802.11ax / Wi-Fi 6E):\n• 59 neue Kanäle!\n• Weniger Interferenz\n\nRegel: Benachbarte APs → unterschiedliche Kanäle',
           },
         },
       ],
@@ -90,7 +90,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Wireless Begriffe',
-            content: 'SSID: Netzwerkname (max. 32 Zeichen)\nBSSID: MAC-Adresse des AP-Radios\nBSS: Ein AP + seine Clients\nESS: Mehrere APs, gleiche SSID\n\nRoaming: Client wechselt AP automatisch\n→ Voraussetzung: Gleiche SSID + gleiche Sicherheit\n→ 802.11r (Fast Transition) für schnelles Roaming\n\nBeacon Frame: AP sendet alle ~100ms\n→ Enthält: SSID, Kanal, Verschlüsselung, Datenraten\n→ Beacon kann versteckt werden (Hidden SSID)',
+            content: 'SSID: Netzwerkname (max. 32 Zeichen)\nBSSID: MAC-Adresse des AP-Radios\nBSS: Ein AP + seine Clients\nESS: Mehrere APs, gleiche SSID\n\nRoaming: Client wechselt AP automatisch\n→ Voraussetzung: Gleiche SSID + gleiche Sicherheit\n→ 802.11r (Fast Transition) für schnelles Roaming\n\nBeacon Frame: AP sendet alle ~100ms\n→ Enthält: SSID, Kanal, Verschlüsselung, Datenraten\n→ Beacon wird weiter gesendet, nur das SSID-Feld bleibt leer (Hidden SSID — kein echter Schutz)',
           },
         },
       ],
@@ -122,7 +122,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Wi-Fi Standards',
-            content: 'Wi-Fi 4 (802.11n): 2.4+5 GHz, bis 600 Mbit/s\nWi-Fi 5 (802.11ac): 5 GHz, bis 3.5 Gbit/s\nWi-Fi 6 (802.11ax): 2.4+5 GHz, bis 9.6 Gbit/s\nWi-Fi 6E: + 6 GHz Band\nWi-Fi 7 (802.11be): Alle 3 Bänder, bis 46 Gbit/s\n\nRF-Probleme:\n• Absorption: Wände, Glas, Wasser schwächen Signal\n• Reflexion: Metall reflektiert Signale\n• Interferenz: Mikrowellen, Bluetooth, andere APs\n• RSSI: Signalstärke (gut: > -65 dBm)',
+            content: 'Wi-Fi 4 (802.11n): 2.4+5 GHz, bis 600 Mbit/s\nWi-Fi 5 (802.11ac): 5 GHz, bis ~6,9 Gbit/s (theoretisch)\nWi-Fi 6 (802.11ax): 2.4+5 GHz, bis 9.6 Gbit/s\nWi-Fi 6E: + 6 GHz Band\nWi-Fi 7 (802.11be): Alle 3 Bänder, bis 46 Gbit/s\n\nRF-Probleme:\n• Absorption: Wände, Glas, Wasser schwächen Signal\n• Reflexion: Metall reflektiert Signale\n• Interferenz: Mikrowellen, Bluetooth, andere APs\n• RSSI: Signalstärke (gut: > -65 dBm)',
           },
         },
       ],
@@ -134,7 +134,7 @@ const lesson: Lesson = {
         {
           title: 'WLAN-Sicherheit: WPA2 & WPA3',
           description:
-            'Ohne Verschlüsselung kann jeder in Funkreichweite mitlesen! WEP ist veraltet und in Sekunden knackbar. WPA2 mit AES ist der aktuelle Standard. WPA3 bringt zusätzliche Sicherheit: SAE (statt PSK), Forward Secrecy und Schutz gegen Offline-Wörterbuch-Angriffe.',
+            'Ohne Verschlüsselung kann jeder in Funkreichweite mitlesen! WEP ist veraltet und in Sekunden knackbar. WPA2 mit AES ist der aktuelle Standard. WPA3 bringt zusätzliche Sicherheit: SAE (ein sicherer Handshake, der den WPA2-Schlüsselaustausch ersetzt — das WLAN-Passwort bleibt, ist aber gegen Offline-Angriffe geschützt), Forward Secrecy und Schutz gegen Offline-Wörterbuch-Angriffe.',
           scene: {
             devices: [
               { id: 'ap', type: 'access-point', label: 'Corporate AP\nWPA2-Enterprise\n802.1X', position: { x: 350, y: 130 } },
@@ -155,7 +155,7 @@ const lesson: Lesson = {
                 label: 'Auth',
                 color: '#4ade80',
                 hops: [
-                  { fromDevice: 'laptop', toDevice: 'ap', hint: 'Mitarbeiter-Laptop verbindet sich. Statt einem festen Passwort schickt er User/Passwort über 802.1X.' },
+                  { fromDevice: 'laptop', toDevice: 'ap', hint: 'Mitarbeiter-Laptop verbindet sich. Statt einem festen WLAN-Passwort authentifiziert es sich per 802.1X/EAP mit eigenen Zugangsdaten (User+Passwort oder Zertifikat) — geschützt, nicht im Klartext.' },
                   { fromDevice: 'ap', toDevice: 'radius', hint: 'AP leitet die Anmeldung an den RADIUS-Server weiter — der prüft im Active Directory ob die Credentials stimmen.' },
                 ],
               },
@@ -173,7 +173,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Sicherheitsstandards',
-            content: 'WEP: ✗ Veraltet, in Sekunden knackbar\n\nWPA2-Personal (PSK):\n• Gemeinsames Passwort für alle\n• AES-CCMP Verschlüsselung\n• Gut für zuhause\n\nWPA2-Enterprise (802.1X):\n• Individuelle Logins (User/Pass oder Zertifikat)\n• RADIUS-Server authentifiziert\n• Standard in Unternehmen\n\nWPA3-Personal (SAE):\n• Schutz gegen Brute-Force\n• Forward Secrecy\n• Kein Offline-Angriff möglich\n\nWPA3-Enterprise:\n• 192-Bit Sicherheit\n• CNSA Suite (militärisch)',
+            content: 'WEP: ✗ Veraltet, in Sekunden knackbar\n\nWPA2-Personal (PSK):\n• Gemeinsames Passwort für alle\n• AES-CCMP Verschlüsselung\n• Gut für zuhause\n\nWPA2-Enterprise (802.1X):\n• Individuelle Logins (User/Pass oder Zertifikat)\n• RADIUS-Server authentifiziert\n• Standard in Unternehmen\n\nWPA3-Personal (SAE):\n• Schutz gegen Brute-Force\n• Forward Secrecy\n• Kein Offline-Angriff möglich\n\nWPA3-Enterprise:\n• stärkere Authentifizierung als WPA2\n• optionaler 192-Bit-Modus (CNSA) für Hochsicherheit',
           },
         },
       ],

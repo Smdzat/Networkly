@@ -303,11 +303,11 @@ const lesson: Lesson = {
           analogy: 'Wie ein Rezeptionist der sich merkt: "Herr Müller sitzt an Platz 3, Frau Schmidt an Platz 7".',
           scene: {
             devices: [
-              { id: 'pc1', type: 'pc', label: 'PC 1\nMAC: AA:BB:CC:01', position: { x: 100, y: 100 } },
-              { id: 'pc2', type: 'pc', label: 'PC 2\nMAC: AA:BB:CC:02', position: { x: 100, y: 280 } },
-              { id: 'pc3', type: 'laptop', label: 'PC 3\nMAC: AA:BB:CC:03', position: { x: 100, y: 440 } },
+              { id: 'pc1', type: 'pc', label: 'PC 1\nMAC: AA:BB:CC:00:00:01', position: { x: 100, y: 100 } },
+              { id: 'pc2', type: 'pc', label: 'PC 2\nMAC: AA:BB:CC:00:00:02', position: { x: 100, y: 280 } },
+              { id: 'pc3', type: 'laptop', label: 'PC 3\nMAC: AA:BB:CC:00:00:03', position: { x: 100, y: 440 } },
               { id: 'switch1', type: 'switch', label: 'Switch\nMAC-Tabelle', position: { x: 400, y: 270 } },
-              { id: 'server1', type: 'server', label: 'Server\nMAC: DD:EE:FF:04', position: { x: 700, y: 270 } },
+              { id: 'server1', type: 'server', label: 'Server\nMAC: DD:EE:FF:00:00:04', position: { x: 700, y: 270 } },
             ],
             cables: [
               { id: 'c1', from: 'pc1', to: 'switch1', type: 'ethernet', label: 'Port Fa0/1' },
@@ -321,8 +321,8 @@ const lesson: Lesson = {
                 label: 'Frame',
                 color: '#fbbf24',
                 hops: [
-                  { fromDevice: 'pc1', toDevice: 'switch1', hint: 'PC 1 (MAC: AA:BB:CC:01) schickt einen Frame — der Switch merkt sich: "Port Fa0/1 = AA:BB:CC:01"' },
-                  { fromDevice: 'switch1', toDevice: 'server1', hint: 'Der Switch schaut in seine MAC-Tabelle: "DD:EE:FF:04 → Port Gi0/1" und leitet gezielt weiter' },
+                  { fromDevice: 'pc1', toDevice: 'switch1', hint: 'PC 1 (MAC: AA:BB:CC:00:00:01) schickt einen Frame — der Switch merkt sich: "Port Fa0/1 = AA:BB:CC:00:00:01"' },
+                  { fromDevice: 'switch1', toDevice: 'server1', hint: 'Der Switch schaut in seine MAC-Tabelle: "DD:EE:FF:00:00:04 → Port Gi0/1" und leitet gezielt weiter' },
                 ],
               },
             ],
@@ -330,7 +330,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'MAC-Adress-Tabelle',
-            content: 'show mac address-table:\n\nPort Fa0/1 → AA:BB:CC:01\nPort Fa0/2 → AA:BB:CC:02\nPort Fa0/3 → AA:BB:CC:03\nPort Gi0/1 → DD:EE:FF:04\n\nEinträge werden nach 300 Sek. (Aging Time) gelöscht, wenn kein Traffic kommt.',
+            content: 'show mac address-table:\n\nPort Fa0/1 → AA:BB:CC:00:00:01\nPort Fa0/2 → AA:BB:CC:00:00:02\nPort Fa0/3 → AA:BB:CC:00:00:03\nPort Gi0/1 → DD:EE:FF:00:00:04\n\nEinträge werden nach 300 Sek. (Aging Time) gelöscht, wenn kein Traffic kommt.',
           },
         },
       ],
@@ -368,7 +368,7 @@ const lesson: Lesson = {
                 color: '#fbbf24',
                 hops: [
                   { fromDevice: 'pc3', toDevice: 'l3sw', hint: 'Marketing-PC (VLAN 20) will auf den ERP-Server (VLAN 10) — unterschiedliche Netzwerke!' },
-                  { fromDevice: 'l3sw', toDevice: 'server1', hint: 'Der L3-Switch routet zwischen VLANs — er ändert die VLAN-ID und leitet das Paket weiter' },
+                  { fromDevice: 'l3sw', toDevice: 'server1', hint: 'Der L3-Switch routet zwischen den VLANs: er prüft die Ziel-IP, schreibt die Quell-/Ziel-MAC neu, verringert die TTL und legt das Paket ins Ziel-VLAN (VLAN 10).' },
                 ],
               },
             ],

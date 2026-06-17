@@ -97,7 +97,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Befehle pro OS',
-            content: 'macOS:\n• ifconfig en0 → Ethernet Interface\n• ifconfig en1 → Wi-Fi Interface\n• networksetup -getinfo Wi-Fi\n• scutil --dns → DNS Konfiguration\n• route get default → Default Gateway\n\nLinux:\n• ip addr show (ip a) → Interfaces & IPs\n• ip route → Routing-Tabelle\n• ip link show → Interface Status\n• cat /etc/resolv.conf → DNS\n• ss -tulnp → Offene Ports\n• nmcli device show → NetworkManager\n\nBeide: ping, traceroute, nslookup, dig',
+            content: 'macOS:\n• ifconfig → alle Interfaces (en0, en1 ...)\n• networksetup -listallhardwareports → welches en ist WLAN/Ethernet?\n  (variiert je nach Mac — auf modernen MacBooks ist en0 oft WLAN)\n• scutil --dns → DNS Konfiguration\n• route get default → Default Gateway\n\nLinux:\n• ip addr show (ip a) → Interfaces & IPs\n• ip route → Routing-Tabelle\n• ip link show → Interface Status\n• cat /etc/resolv.conf → DNS\n• ss -tulnp → Offene Ports\n• nmcli device show → NetworkManager\n\nBeide: ping, traceroute, nslookup, dig',
           },
         },
       ],

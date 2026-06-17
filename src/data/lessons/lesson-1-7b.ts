@@ -126,8 +126,17 @@ const lesson: Lesson = {
                 label: 'DISCOVER',
                 color: '#fbbf24',
                 hops: [
-                  { fromDevice: 'pc', toDevice: 'sw', hint: '① DHCP Discover: Der PC ruft ins Netzwerk: "Gibt es hier einen DHCP-Server?" (Broadcast an 255.255.255.255)' },
-                  { fromDevice: 'sw', toDevice: 'dhcp', hint: '② DHCP Offer: Der Server antwortet: "Ja! Ich biete dir 192.168.1.100, Gateway .1, DNS 8.8.8.8, Lease: 24h"' },
+                  { fromDevice: 'pc', toDevice: 'sw', hint: '① DHCP Discover: Der PC ruft ins Netzwerk: "Gibt es hier einen DHCP-Server?" (Broadcast an 255.255.255.255, Quelle 0.0.0.0)' },
+                  { fromDevice: 'sw', toDevice: 'dhcp', hint: 'Der Switch flutet den Broadcast — so erreicht der Discover auch den DHCP-Server.' },
+                ],
+              },
+              {
+                id: 'offer',
+                label: 'OFFER',
+                color: '#60a5fa',
+                hops: [
+                  { fromDevice: 'dhcp', toDevice: 'sw', hint: '② DHCP Offer: Der Server antwortet: "Ich biete dir 192.168.1.100, Gateway .1, DNS 8.8.8.8, Lease: 24h."' },
+                  { fromDevice: 'sw', toDevice: 'pc', hint: 'Das Angebot wandert zurück zum PC.' },
                 ],
               },
               {
@@ -135,8 +144,17 @@ const lesson: Lesson = {
                 label: 'REQUEST',
                 color: '#4ade80',
                 hops: [
-                  { fromDevice: 'pc', toDevice: 'sw', hint: '③ DHCP Request: Der PC sagt: "Danke, ich nehme 192.168.1.100!" (Falls mehrere Server geantwortet haben, wählt er einen)' },
-                  { fromDevice: 'sw', toDevice: 'dhcp', hint: '④ DHCP ACK: Der Server bestätigt: "Ok, 192.168.1.100 gehört jetzt dir für 24 Stunden (Lease Time)!"' },
+                  { fromDevice: 'pc', toDevice: 'sw', hint: '③ DHCP Request: Der PC sagt: "Ich nehme 192.168.1.100!" (wieder Broadcast — falls mehrere Server geantwortet haben, sehen alle die Wahl)' },
+                  { fromDevice: 'sw', toDevice: 'dhcp', hint: 'Der gewählte DHCP-Server erfährt: sein Angebot wurde angenommen.' },
+                ],
+              },
+              {
+                id: 'ack',
+                label: 'ACK',
+                color: '#a78bfa',
+                hops: [
+                  { fromDevice: 'dhcp', toDevice: 'sw', hint: '④ DHCP ACK: Der Server bestätigt: "Ok, 192.168.1.100 gehört jetzt dir für 24 Stunden (Lease Time)!"' },
+                  { fromDevice: 'sw', toDevice: 'pc', hint: 'Der PC hat jetzt IP, Maske, Gateway und DNS — fertig konfiguriert. DORA abgeschlossen!' },
                 ],
               },
             ],

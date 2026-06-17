@@ -170,7 +170,7 @@ const lesson: Lesson = {
               { id: 'pc3', type: 'laptop', label: 'Laptop C\nCC:33 → Fa0/3', position: { x: 80, y: 430 } },
               { id: 'sw1', type: 'switch', label: 'Access Switch\nshow mac address-table', position: { x: 380, y: 270 } },
               { id: 'sw2', type: 'switch', label: 'Distribution Switch\nlernt via Trunk', position: { x: 620, y: 160 } },
-              { id: 'server', type: 'server', label: 'Server\nDD:44 → Gi0/1', position: { x: 620, y: 380 } },
+              { id: 'server', type: 'server', label: 'Server\nDD:44 → Gi0/2', position: { x: 620, y: 380 } },
             ],
             cables: [
               { id: 'c1', from: 'pc1', to: 'sw1', type: 'ethernet', label: 'Fa0/1' },

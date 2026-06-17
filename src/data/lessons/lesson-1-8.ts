@@ -97,7 +97,7 @@ const lesson: Lesson = {
                 hops: [
                   { fromDevice: 'pc1', toDevice: 'sw', hint: 'PC1 sendet einen ICMPv6 Echo Request — das IPv6-Pendant zum klassischen Ping. Quelle: 2001:db8:0:1::10' },
                   { fromDevice: 'sw', toDevice: 'router', hint: 'Switch reicht weiter. IPv6-Adressen sind länger, aber das Layer-2-Forwarding ändert sich nicht — es zählt nur die MAC.' },
-                  { fromDevice: 'router', toDevice: 'r2', hint: 'Router prüft das /64-Prefix und routet via Point-to-Point /126 Link zum WAN-Router. /126 reicht: 4 Adressen, davon 2 nutzbar.' },
+                  { fromDevice: 'router', toDevice: 'r2', hint: 'Router prüft das /64-Prefix und routet über den Point-to-Point-Link zum WAN-Router. Für so einen Link braucht man nur 2 Adressen (je ein Router-Ende) — IPv6 hat keine Broadcast-Adresse. Üblich sind /127 (RFC 6164) oder /126.' },
                 ],
               },
             ],

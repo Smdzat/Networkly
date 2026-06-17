@@ -156,7 +156,7 @@ const lesson: Lesson = {
           },
           modal: {
             title: 'Multimode Details',
-            content: 'Kern: 50µm (OM3/OM4) oder 62.5µm (OM1/OM2)\nStecker-Farbe: Orange (OM1/2) oder Aqua (OM3/4)\n\nOM1: 100m bei 10G — veraltet\nOM2: 150m bei 10G — veraltet\nOM3: 300m bei 10G — Standard\nOM4: 400m bei 10G — Premium\nOM5: 300m bei 25G/100G — Breitband-MMF\n\nSFP: SFP+ SR (Short Reach) = 10G Multimode',
+            content: 'Kern: 50µm (OM3/OM4) oder 62.5µm (OM1/OM2)\nStecker-Farbe: Orange (OM1/2) oder Aqua (OM3/4)\n\nOM1: 33m bei 10G — veraltet\nOM2: 82m bei 10G — veraltet\nOM3: 300m bei 10G — Standard\nOM4: 400m bei 10G — Premium\nOM5: bis 150m bei 100G (SWDM) — Breitband-MMF\n\nSFP: SFP+ SR (Short Reach) = 10G Multimode',
           },
         },
       ],

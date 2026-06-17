@@ -1422,7 +1422,7 @@ export default function LandingPage() {
           )}
 
           <p className="signup__hint">
-            No spam — just one launch ping.
+            Kein Spam — nur eine Nachricht zum Launch.
           </p>
 
           <p className="signup__success" role="status">
